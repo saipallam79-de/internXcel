@@ -83,5 +83,6 @@ bootstrap_database()
 
 
 @app.get("/api/health", tags=["system"])
+@app.get("/health", tags=["system"])
 def health_check() -> dict[str, str]:
     return {"status": "ok", "service": "internxcel-api"}

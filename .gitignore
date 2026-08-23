@@ -1,7 +1,7 @@
 __pycache__/
-*.pyc
 *.py[cod]
 .venv/
+.venv-1/
 .env
 *.db
 uploads/
