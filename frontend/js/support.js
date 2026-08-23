@@ -1,4 +1,4 @@
-const supportApi = 'http://127.0.0.1:8000';
+const supportApi = window.API_BASE_URL;
 const supportToken = localStorage.getItem('internxcel_token');
 const supportForm = document.querySelector('[data-support-form]');
 const supportStatus = document.querySelector('[data-support-status]');

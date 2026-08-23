@@ -1,4 +1,4 @@
-const leaderboardApi = 'http://127.0.0.1:8000';
+const leaderboardApi = window.API_BASE_URL;
 const leaderboardToken = localStorage.getItem('internxcel_token');
 const leaderboardRows = document.querySelector('[data-leaderboard-rows]');
 const leaderboardStatus = document.querySelector('[data-leaderboard-status]');

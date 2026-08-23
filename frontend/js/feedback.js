@@ -1,4 +1,4 @@
-const feedbackApi = 'http://127.0.0.1:8000';
+const feedbackApi = window.API_BASE_URL;
 const feedbackToken = localStorage.getItem('internxcel_token');
 const feedbackForm = document.querySelector('[data-feedback-form]');
 const feedbackStatus = document.querySelector('[data-feedback-status]');

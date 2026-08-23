@@ -1,4 +1,4 @@
-const verifyApi = 'http://127.0.0.1:8000';
+const verifyApi = window.API_BASE_URL;
 const verifyForm = document.querySelector('#verify-form');
 const verifyMessage = document.querySelector('#verification-message');
 const verifyResult = document.querySelector('#verification-result');

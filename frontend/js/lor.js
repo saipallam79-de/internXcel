@@ -1,4 +1,4 @@
-const lorApi = 'http://127.0.0.1:8000';
+const lorApi = window.API_BASE_URL;
 const lorToken = localStorage.getItem('internxcel_token');
 const lorButton = document.querySelector('[data-generate-lor]');
 const lorMessage = document.querySelector('[data-lor-message]');

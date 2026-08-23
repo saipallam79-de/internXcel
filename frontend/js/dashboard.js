@@ -1,4 +1,4 @@
-const dashboardApi = 'http://127.0.0.1:8000';
+const dashboardApi = window.API_BASE_URL;
 const dashboardToken = localStorage.getItem('internxcel_token');
 const dashboardHeaders = {Authorization: `Bearer ${dashboardToken}`};
 

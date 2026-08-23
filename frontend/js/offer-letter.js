@@ -1,4 +1,4 @@
-const offerApi = 'http://127.0.0.1:8000';
+const offerApi = window.API_BASE_URL;
 const offerToken = localStorage.getItem('internxcel_token');
 const downloadButton = document.querySelector('[data-download-offer]');
 const statusElement = document.querySelector('[data-letter-status]');

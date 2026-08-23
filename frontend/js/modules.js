@@ -1,4 +1,4 @@
-const modulesApi = 'http://127.0.0.1:8000';
+const modulesApi = window.API_BASE_URL;
 const modulesToken = localStorage.getItem('internxcel_token');
 const pathElement = document.querySelector('[data-learning-path]');
 const statusElement = document.querySelector('[data-learning-status]');

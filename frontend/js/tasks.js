@@ -1,4 +1,4 @@
-const tasksApi = 'http://127.0.0.1:8000';
+const tasksApi = window.API_BASE_URL;
 const tasksToken = localStorage.getItem('internxcel_token');
 const taskList = document.querySelector('[data-task-list]');
 const taskStatus = document.querySelector('[data-task-status]');

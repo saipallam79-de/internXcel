@@ -1,4 +1,4 @@
-const enrollmentApi = 'http://127.0.0.1:8000';
+const enrollmentApi = window.API_BASE_URL;
 const enrollmentToken = localStorage.getItem('internxcel_token');
 const enrollmentForm = document.querySelector('#enrollment-form');
 const enrollmentMessage = document.querySelector('[data-enrollment-message]');
