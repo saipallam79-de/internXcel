@@ -30,16 +30,44 @@ function renderDashboard(data) {
   setText('[data-notification-count]', data.notifications.length);
 }
 
+function renderNoEnrollment() {
+  setText('[data-domain-name]', 'No internship enrolled yet');
+  setText('[data-intern-id]', 'Not assigned');
+  setText('[data-internship-status]', 'Not enrolled');
+  setText('[data-progress-value]', '0');
+  setText('[data-module-count]', 'Enroll to start your learning path');
+  setText('[data-current-module]', 'Choose an internship path');
+  setText('[data-current-module-number]', 'Start by selecting a domain');
+  setText('[data-pending-tasks]', '0');
+  setText('[data-reward-points]', '0');
+  setText('[data-certificate-status]', 'Complete an internship to unlock');
+  setText('[data-next-step]', 'Choose an internship path to begin your learning journey.');
+  const bar = document.querySelector('[data-progress-bar]');
+  if (bar) bar.style.width = '0%';
+}
+
 if (!dashboardToken) {
   window.location.href = '../login.html';
 } else {
   fetch(`${dashboardApi}/api/dashboard/summary`, {headers: dashboardHeaders})
-    .then((response) => {
-      if (!response.ok) throw new Error('Session expired');
+    .then(async (response) => {
+      if (response.status === 404) {
+        renderNoEnrollment();
+        return null;
+      }
+      if (response.status === 401) throw new Error('Session expired');
+      if (!response.ok) throw new Error('Unable to load your dashboard.');
       return response.json();
     })
-    .then(renderDashboard)
-    .catch(() => {
+    .then((data) => { if (data) renderDashboard(data); })
+    .catch((error) => {
+      if (error.message !== 'Session expired') {
+        setText('[data-domain-name]', 'Dashboard unavailable');
+        setText('[data-intern-id]', 'Please try again');
+        setText('[data-internship-status]', 'Unavailable');
+        setText('[data-current-module]', error.message);
+        return;
+      }
       localStorage.removeItem('internxcel_token');
       window.location.href = '../login.html';
     });
