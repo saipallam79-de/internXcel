@@ -36,3 +36,12 @@ class UserResponse(BaseModel):
     status: str
 
     model_config = {"from_attributes": True}
+
+
+class ProfileUpdateRequest(BaseModel):
+    full_name: str = Field(min_length=2, max_length=150)
+    mobile: str
+    college: str
+    degree: str
+    branch: str
+    year: int

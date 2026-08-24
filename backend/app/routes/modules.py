@@ -15,7 +15,7 @@ router = APIRouter(prefix="/api/modules", tags=["modules"])
 def module_status(module: Module, modules: list[Module], completed_ids: set[int]) -> str:
     if module.id in completed_ids:
         return "completed"
-    if module.module_number == 1 or (module.module_number - 1 in {item.module_number for item in modules if item.id in completed_ids}):
+    if module.module_number == 0 or (module.module_number - 1 in {item.module_number for item in modules if item.id in completed_ids}):
         return "available"
     return "locked"
 

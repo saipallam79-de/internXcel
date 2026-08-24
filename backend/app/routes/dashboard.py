@@ -23,8 +23,9 @@ def summary(user: User = Depends(current_user), db: Session = Depends(get_db)):
     modules = list(db.scalars(select(Module).where(Module.domain_id == internship.domain_id).order_by(Module.module_number)).all())
     completed_ids = set(db.scalars(select(ModuleCompletion.module_id).where(ModuleCompletion.internship_id == internship.id, ModuleCompletion.status == "completed")).all())
     current_module = next((module for module in modules if module.id not in completed_ids), None)
-    pending_tasks = db.scalar(select(func.count(Task.id)).join(Module, Task.module_id == Module.id).where(Module.domain_id == internship.domain_id)) or 0
     submitted_tasks = db.scalar(select(func.count(Submission.id)).join(Task, Submission.task_id == Task.id).join(Module, Task.module_id == Module.id).where(Submission.user_id == user.id, Module.domain_id == internship.domain_id, Submission.status.in_(["pending_review", "approved"]))) or 0
+    completed_tasks = db.scalar(select(func.count(Submission.id)).join(Task, Submission.task_id == Task.id).join(Module, Task.module_id == Module.id).where(Submission.user_id == user.id, Module.domain_id == internship.domain_id, Submission.status == "approved")) or 0
+    total_tasks = db.scalar(select(func.count(Task.id)).join(Module, Task.module_id == Module.id).where(Module.domain_id == internship.domain_id)) or 0
     offer = db.scalar(select(OfferLetter).where(OfferLetter.internship_id == internship.id))
     certificate = db.scalar(select(Certificate).where(Certificate.internship_id == internship.id))
     rewards = list(db.scalars(select(StudentReward).where(StudentReward.user_id == user.id).order_by(StudentReward.awarded_at.desc())).all())
@@ -33,7 +34,7 @@ def summary(user: User = Depends(current_user), db: Session = Depends(get_db)):
         "student": {"id": user.id, "name": user.full_name, "email": user.email},
         "internship": {"id": internship.id, "domain": domain.name, "intern_id": internship.intern_id, "status": internship.status, "progress": internship.progress, "start_date": internship.start_date, "end_date": internship.end_date},
         "modules": {"completed": len(completed_ids), "total": len(modules), "current": {"id": current_module.id, "title": current_module.title, "module_number": current_module.module_number} if current_module else None},
-        "tasks": {"pending": max(pending_tasks - submitted_tasks, 0), "submitted": submitted_tasks},
+        "tasks": {"total": total_tasks, "completed": completed_tasks, "pending": max(total_tasks - completed_tasks, 0), "submitted": submitted_tasks},
         "documents": {"offer_letter": bool(offer), "certificate": bool(certificate and certificate.status == "valid"), "certificate_id": certificate.certificate_id if certificate else None},
         "rewards": {"points": sum(reward.points for reward in rewards), "badges": [reward.badge for reward in rewards]},
         "notifications": [{"title": item.title, "message": item.message, "is_read": item.is_read} for item in notifications],

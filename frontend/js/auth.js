@@ -34,6 +34,7 @@ document.querySelector('[data-auth-form]')?.addEventListener('submit', async (ev
 		});
 		const data = await response.json();
 		if (!response.ok) throw new Error(data.detail || 'Something went wrong. Please try again.');
+		window.clearInternXcelSession?.();
 		localStorage.setItem('internxcel_token', data.access_token);
 		setAuthMessage('Success. Opening your dashboard...', true);
 		button.textContent = 'Ready ✓';
@@ -46,7 +47,7 @@ document.querySelector('[data-auth-form]')?.addEventListener('submit', async (ev
 });
 
 function logout() {
-	localStorage.removeItem('internxcel_token');
+	window.clearInternXcelSession?.();
 	window.location.href = '../index.html';
 }
 

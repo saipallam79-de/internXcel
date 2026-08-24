@@ -21,7 +21,31 @@ def list_tasks(module_id: int | None = None, user: User = Depends(current_user),
     query = select(Task).join(Module, Task.module_id == Module.id).where(Module.domain_id == internship.domain_id)
     if module_id:
         query = query.where(Task.module_id == module_id)
-    return list(db.scalars(query.order_by(Task.deadline, Task.id)).all())
+    modules = list(db.scalars(select(Module).where(Module.domain_id == internship.domain_id).order_by(Module.module_number)).all())
+    completed_ids = set(db.scalars(select(ModuleCompletion.module_id).where(ModuleCompletion.internship_id == internship.id, ModuleCompletion.status == "completed")).all())
+    module_by_id = {module.id: module for module in modules}
+    tasks = list(db.scalars(query.order_by(Module.module_number, Task.id)).all())
+    return [{
+        "id": task.id,
+        "module_id": task.module_id,
+        "module_number": module_by_id[task.module_id].module_number,
+        "module_title": module_by_id[task.module_id].title,
+        "title": task.title,
+        "description": task.description,
+        "instructions": task.instructions,
+        "submission_type": task.submission_type,
+        "required_links": task.required_links,
+        "status": "completed" if db.scalar(select(Submission.id).where(Submission.task_id == task.id, Submission.user_id == user.id, Submission.status == "approved")) else "pending",
+        "module_status": _module_status(module_by_id[task.module_id], modules, completed_ids),
+    } for task in tasks]
+
+
+def _module_status(module: Module, modules: list[Module], completed_ids: set[int]) -> str:
+    if module.id in completed_ids:
+        return "completed"
+    if module.module_number == 0 or (module.module_number - 1 in {item.module_number for item in modules if item.id in completed_ids}):
+        return "available"
+    return "locked"
 
 
 @router.post("/{task_id}/submit")
@@ -35,6 +59,8 @@ def submit_task(task_id: int, payload: TaskSubmissionRequest, user: User = Depen
         raise HTTPException(status_code=403, detail="Task is outside your internship")
     if not any([payload.github_url, payload.live_url, payload.linkedin_url, payload.text_response]):
         raise HTTPException(status_code=422, detail="Provide at least one submission item")
+    if task.submission_type == "linkedin_url" and not payload.linkedin_url:
+        raise HTTPException(status_code=422, detail="Submit the LinkedIn post URL for onboarding")
     submission = Submission(task_id=task.id, user_id=user.id, github_url=str(payload.github_url) if payload.github_url else None, live_url=str(payload.live_url) if payload.live_url else None, linkedin_url=str(payload.linkedin_url) if payload.linkedin_url else None, text_response=payload.text_response, status="pending_review")
     db.add(submission)
     db.commit()

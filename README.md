@@ -19,7 +19,7 @@ API docs: http://127.0.0.1:8000/docs
 
 Open `frontend/index.html` directly, or serve the repository with any static server.
 
-The frontend currently uses demo data and is ready to connect to the FastAPI routes through `frontend/js/main.js`.
+The frontend is wired to the live FastAPI routes and keeps all student data scoped to the authenticated user account.
 
 ## Product promise
 

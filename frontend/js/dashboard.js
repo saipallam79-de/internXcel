@@ -7,10 +7,20 @@ function setText(selector, value) {
   if (element) element.textContent = value;
 }
 
+function getInitials(name) {
+  return (name || 'U')
+    .split(/\s+/)
+    .filter(Boolean)
+    .map((part) => part[0])
+    .slice(0, 2)
+    .join('')
+    .toUpperCase() || 'U';
+}
+
 function renderDashboard(data) {
-  const firstName = data.student.name.split(' ')[0];
-  setText('[data-welcome-name]', `${firstName}.`);
-  setText('[data-avatar]', data.student.name.split(' ').map((part) => part[0]).slice(0, 2).join('').toUpperCase());
+  const displayName = data.student.name || 'Student';
+  setText('[data-welcome-name]', displayName);
+  setText('[data-avatar]', getInitials(displayName));
   setText('[data-domain-name]', data.internship.domain);
   setText('[data-intern-id]', data.internship.intern_id);
   setText('[data-internship-status]', data.internship.status);
@@ -21,6 +31,7 @@ function renderDashboard(data) {
   setText('[data-pending-tasks]', data.tasks.pending);
   setText('[data-reward-points]', data.rewards.points);
   setText('[data-certificate-status]', data.documents.certificate ? 'Certificate available to download' : 'Complete the path to unlock');
+  setText('[data-next-step]', data.modules.current ? `Complete ${data.modules.current.title.toLowerCase()} and submit its practical task to unlock the next milestone.` : 'Your internship path is complete.');
   const bar = document.querySelector('[data-progress-bar]');
   if (bar) bar.style.width = `${data.internship.progress}%`;
   const notifications = document.querySelector('[data-notifications]');
@@ -30,7 +41,12 @@ function renderDashboard(data) {
   setText('[data-notification-count]', data.notifications.length);
 }
 
-function renderNoEnrollment() {
+function renderNoEnrollment(user) {
+  if (user) {
+    const displayName = user.full_name || 'Student';
+    setText('[data-welcome-name]', displayName);
+    setText('[data-avatar]', getInitials(displayName));
+  }
   setText('[data-domain-name]', 'No internship enrolled yet');
   setText('[data-intern-id]', 'Not assigned');
   setText('[data-internship-status]', 'Not enrolled');
@@ -52,8 +68,10 @@ if (!dashboardToken) {
   fetch(`${dashboardApi}/api/dashboard/summary`, {headers: dashboardHeaders})
     .then(async (response) => {
       if (response.status === 404) {
-        renderNoEnrollment();
-        return null;
+        return fetch(`${dashboardApi}/api/auth/me`, {headers: dashboardHeaders})
+          .then((profileResponse) => profileResponse.ok ? profileResponse.json() : null)
+          .then(renderNoEnrollment)
+          .then(() => null);
       }
       if (response.status === 401) throw new Error('Session expired');
       if (!response.ok) throw new Error('Unable to load your dashboard.');
@@ -73,5 +91,9 @@ if (!dashboardToken) {
     });
 }
 
-document.querySelectorAll('[data-logout]').forEach((link) => link.addEventListener('click', () => localStorage.removeItem('internxcel_token')));
+document.querySelectorAll('[data-logout]').forEach((link) => link.addEventListener('click', (event) => {
+  event.preventDefault();
+  window.clearInternXcelSession?.();
+  window.location.href = '../index.html';
+}));
 document.querySelector('[data-sidebar-toggle]')?.addEventListener('click', () => document.body.classList.toggle('sidebar-open'));

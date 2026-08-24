@@ -7,10 +7,19 @@ const taskForm = document.querySelector('[data-task-form]');
 
 if (!tasksToken) window.location.href = '../login.html';
 else fetch(`${tasksApi}/api/tasks`, {headers: {Authorization: `Bearer ${tasksToken}`}})
-  .then((response) => response.json())
+  .then((response) => {
+    if (response.status === 404) {
+      taskStatus.textContent = 'No active internship yet.';
+      taskList.innerHTML = '<p class="empty-state">Your task board opens after enrollment. <a href="../internship/index.html">Choose your internship path</a> to get started.</p>';
+      return null;
+    }
+    if (!response.ok) throw new Error('Unable to load your tasks.');
+    return response.json();
+  })
   .then((tasks) => {
-    taskStatus.textContent = tasks.length ? `${tasks.length} practical task${tasks.length === 1 ? '' : 's'} in your current domain.` : 'No pending tasks. You are all caught up.';
-    taskList.innerHTML = tasks.map((task) => `<article class="task-row"><div><span>TASK ${String(task.id).padStart(2, '0')}</span><h2>${task.title}</h2><p>${task.description || ''}</p><small>${task.submission_type || 'github_url'} · ${task.deadline || 'No deadline'}</small></div><button class="button button-primary" type="button" data-open-task="${task.id}" data-task-title="${task.title}">Submit work →</button></article>`).join('');
+    if (!tasks) return;
+    taskStatus.textContent = tasks.length ? `${tasks.length} practical task${tasks.length === 1 ? '' : 's'} in your current domain.` : 'No tasks are available yet.';
+    taskList.innerHTML = tasks.map((task) => `<article class="task-row"><div><span>${task.module_status === 'locked' ? 'LOCKED' : task.module_number === 0 ? 'PREREQUISITE ONBOARDING' : `MODULE ${String(task.module_number).padStart(2, '0')}`}</span><h2>${task.title}</h2><p>${task.description || ''}</p><small>${task.instructions || ''}</small><small>${task.required_links || task.submission_type || 'Submission required'}</small></div><button class="button button-primary" type="button" data-open-task="${task.id}" data-task-title="${task.title}" ${task.module_status === 'locked' ? 'disabled' : ''}>${task.module_status === 'locked' ? 'Locked' : task.status === 'completed' ? 'Completed ✓' : 'Submit work →'}</button></article>`).join('');
     taskList.querySelectorAll('[data-open-task]').forEach((button) => button.addEventListener('click', () => {
       submissionPanel.hidden = false;
       taskForm.elements.task_id.value = button.dataset.openTask;

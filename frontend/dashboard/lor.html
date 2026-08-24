@@ -1,1 +1,20 @@
-<!doctype html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>LOR | InternXcel</title><link rel="stylesheet" href="../css/style.css"><link rel="stylesheet" href="../css/dashboard.css"></head><body><main class="page-shell"><a class="arrow-link" href="index.html">← Dashboard</a><p class="eyebrow">Completion status</p><h1 class="page-title">A recommendation<br><em>worth earning.</em></h1><article class="document-preview"><p>LETTER OF RECOMMENDATION</p><h2>Available after completion</h2><p>Finish your internship and your personalized LOR will be generated from your verified internship record.</p></article></main></body></html>
+<!doctype html>
+<html lang="en">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>LOR | InternXcel</title><link rel="stylesheet" href="../css/style.css"><link rel="stylesheet" href="../css/dashboard.css"></head>
+<body>
+  <main class="page-shell">
+    <a class="arrow-link" href="index.html">← Dashboard</a>
+    <p class="eyebrow">Completion status</p>
+    <h1 class="page-title">A recommendation<br><em>worth earning.</em></h1>
+    <section class="document-preview">
+      <p>LETTER OF RECOMMENDATION</p>
+      <h2 data-lor-message>Checking your recommendation eligibility...</h2>
+      <div class="requirement-list" data-lor-requirements></div>
+      <button class="button button-primary" type="button" data-generate-lor disabled>Generate LOR →</button>
+      <p class="auth-message" data-lor-error aria-live="polite"></p>
+    </section>
+  </main>
+  <script src="../js/config.js"></script>
+  <script src="../js/lor.js"></script>
+</body>
+</html>

@@ -158,6 +158,25 @@ def download_offer_letter(internship_id: int, user: User = Depends(current_user)
     return FileResponse(path, media_type="application/pdf", filename="internxcel-offer-letter.pdf")
 
 
+@offer_router.get("/{internship_id}")
+def offer_letter_preview(internship_id: int, user: User = Depends(current_user), db: Session = Depends(get_db)):
+    internship, domain, student = get_owned_internship(internship_id, user, db)
+    offer = db.scalar(select(OfferLetter).where(OfferLetter.internship_id == internship.id, OfferLetter.user_id == student.id))
+    if not offer:
+        raise HTTPException(status_code=404, detail="Offer letter is not available yet")
+    return {
+        "internship_id": internship.id,
+        "student_name": student.full_name,
+        "email": student.email,
+        "domain": domain.name,
+        "intern_id": internship.intern_id,
+        "offer_id": offer.offer_id,
+        "start_date": internship.start_date,
+        "end_date": internship.end_date,
+        "duration_days": domain.duration,
+    }
+
+
 @offer_router.post("/generate-all")
 def generate_all_offer_letters(_: User = Depends(admin_user), db: Session = Depends(get_db)):
     internships = list(db.scalars(select(Internship).where(Internship.status.in_(["active", "completed"]))).all())

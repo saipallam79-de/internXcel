@@ -67,6 +67,21 @@ INSERT INTO modules (domain_id, module_number, title, description, learning_obje
 (8, 5, 'Responsive UI Design', 'Design interfaces that adapt gracefully.', 'Use responsive layouts, accessible states, and design tokens.', 4, 'Figma & Prototyping', 'Responsive UI checklist', TRUE),
 (8, 6, 'Final UI/UX Case Study', 'Present a complete product design story.', 'Show research, decisions, iterations, prototype, and measured outcome.', 6, 'Responsive UI Design', 'Case study rubric', TRUE);
 
+INSERT INTO modules (domain_id, module_number, title, description, learning_objectives, estimated_duration, prerequisites, resources, is_locked) VALUES
+(1, 0, 'Prerequisite Onboarding', 'Publish your personalized offer letter on LinkedIn.', 'Review your offer letter, publish it on LinkedIn, and submit the post URL.', 2, 'None', 'LinkedIn post URL', TRUE),
+(2, 0, 'Prerequisite Onboarding', 'Publish your personalized offer letter on LinkedIn.', 'Review your offer letter, publish it on LinkedIn, and submit the post URL.', 2, 'None', 'LinkedIn post URL', TRUE),
+(3, 0, 'Prerequisite Onboarding', 'Publish your personalized offer letter on LinkedIn.', 'Review your offer letter, publish it on LinkedIn, and submit the post URL.', 2, 'None', 'LinkedIn post URL', TRUE),
+(4, 0, 'Prerequisite Onboarding', 'Publish your personalized offer letter on LinkedIn.', 'Review your offer letter, publish it on LinkedIn, and submit the post URL.', 2, 'None', 'LinkedIn post URL', TRUE),
+(5, 0, 'Prerequisite Onboarding', 'Publish your personalized offer letter on LinkedIn.', 'Review your offer letter, publish it on LinkedIn, and submit the post URL.', 2, 'None', 'LinkedIn post URL', TRUE),
+(6, 0, 'Prerequisite Onboarding', 'Publish your personalized offer letter on LinkedIn.', 'Review your offer letter, publish it on LinkedIn, and submit the post URL.', 2, 'None', 'LinkedIn post URL', TRUE),
+(7, 0, 'Prerequisite Onboarding', 'Publish your personalized offer letter on LinkedIn.', 'Review your offer letter, publish it on LinkedIn, and submit the post URL.', 2, 'None', 'LinkedIn post URL', TRUE),
+(8, 0, 'Prerequisite Onboarding', 'Publish your personalized offer letter on LinkedIn.', 'Review your offer letter, publish it on LinkedIn, and submit the post URL.', 2, 'None', 'LinkedIn post URL', TRUE);
+
 INSERT INTO tasks (module_id, title, description, instructions, submission_type, required_links)
-SELECT modules.id, CONCAT('Practical task: ', modules.title), CONCAT('Apply the concepts from ', modules.title, ' in a focused project.'), 'Build the task, document your decisions, and submit your work for review.', 'github_url', 'github_url'
+SELECT modules.id,
+	   CASE WHEN modules.module_number = 0 THEN 'Post Your Internship Offer Letter on LinkedIn' ELSE CONCAT('Practical task: ', modules.title) END,
+	   CASE WHEN modules.module_number = 0 THEN 'Download your personalized offer letter, publish it on LinkedIn, tag InternXcel if configured, and submit the public post URL.' ELSE CONCAT('Apply the concepts from ', modules.title, ' in a focused project.') END,
+	   CASE WHEN modules.module_number = 0 THEN 'Open your offer letter, publish it on LinkedIn, copy the post URL, and submit that URL here for review.' ELSE 'Build the task, document your decisions, and submit your work for review.' END,
+	   CASE WHEN modules.module_number = 0 THEN 'linkedin_url' ELSE 'github_url' END,
+	   CASE WHEN modules.module_number = 0 THEN 'linkedin_url' ELSE 'github_url' END
 FROM modules;

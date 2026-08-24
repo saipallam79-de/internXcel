@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Certificate | InternXcel</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/dashboard.css">
+</head>
+<body>
+  <main class="page-shell">
+    <a class="arrow-link" href="index.html">← Dashboard</a>
+    <p class="eyebrow">Completion status</p>
+    <h1 class="page-title">Your certificate<br><em>is waiting.</em></h1>
+
+    <section class="document-preview certificate-state" data-certificate-state>
+      <p class="eyebrow">Loading requirements</p>
+      <h2>Checking your completion path...</h2>
+      <p data-certificate-message>Please wait while we check your modules and approved tasks.</p>
+      <div class="requirement-list" data-certificate-requirements></div>
+      <button class="button button-primary" type="button" data-generate-certificate disabled>Generate certificate</button>
+      <p class="auth-message" data-certificate-error aria-live="polite"></p>
+    </section>
+  </main>
+
+  <script src="../js/config.js"></script>
+  <script src="../js/certificate.js"></script>
+</body>
+</html>

@@ -6,7 +6,7 @@ from app.core.dependencies import admin_user
 from app.database.session import get_db
 from app.models.documents import Certificate
 from app.models.internship import Domain, Internship
-from app.models.module import Module
+from app.models.module import Module, ModuleCompletion
 from app.models.task import Submission, Task
 from app.models.user import User
 from app.schemas.admin import DomainCreate, DomainUpdate, ModuleCreate, ReviewRequest
@@ -151,5 +151,21 @@ def review_submission(submission_id: int, payload: ReviewRequest, _: User = Depe
         raise HTTPException(status_code=404, detail="Submission not found")
     submission.status = payload.status
     submission.admin_comment = payload.admin_comment
+    if payload.status == "approved":
+        db.flush()
+        module = db.scalar(select(Module).join(Task, Task.module_id == Module.id).where(Task.id == submission.task_id))
+        internship = db.scalar(select(Internship).where(Internship.user_id == submission.user_id, Internship.status == "active"))
+        if module and internship:
+            module_tasks = list(db.scalars(select(Task).where(Task.module_id == module.id)).all())
+            all_approved = all(db.scalar(select(Submission).where(Submission.task_id == task.id, Submission.user_id == submission.user_id, Submission.status == "approved")) for task in module_tasks)
+            previous = db.scalar(select(Module).where(Module.domain_id == module.domain_id, Module.module_number == module.module_number - 1))
+            previous_done = not previous or db.scalar(select(ModuleCompletion).where(ModuleCompletion.internship_id == internship.id, ModuleCompletion.module_id == previous.id, ModuleCompletion.status == "completed"))
+            if all_approved and previous_done and not db.scalar(select(ModuleCompletion).where(ModuleCompletion.internship_id == internship.id, ModuleCompletion.module_id == module.id)):
+                db.add(ModuleCompletion(internship_id=internship.id, module_id=module.id))
+                total = len(db.scalars(select(Module).where(Module.domain_id == internship.domain_id)).all())
+                completed = len(db.scalars(select(ModuleCompletion).where(ModuleCompletion.internship_id == internship.id, ModuleCompletion.status == "completed")).all()) + 1
+                internship.progress = round((completed / total) * 100) if total else 0
+                if completed >= total:
+                    internship.status = "completed"
     db.commit()
     return {"id": submission.id, "status": submission.status, "admin_comment": submission.admin_comment}
